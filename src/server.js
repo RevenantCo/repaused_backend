@@ -4,9 +4,7 @@ const connectDatabase = require('./config/database');
 const createError = require('http-errors');
 const cors = require('cors');
 const morgan = require('morgan');
-
 const port = process.env.PORT || 3000;
-
 const app = express();
 
 
