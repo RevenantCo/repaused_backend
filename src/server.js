@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express  = require('express');
-
+const connectDatabase = require('./config/database');
 const createError = require('http-errors');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -32,6 +32,8 @@ app.use((err, req, res, next) => {
         }
     });
 });
+
+connectDatabase();
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}/ 🚀`);
