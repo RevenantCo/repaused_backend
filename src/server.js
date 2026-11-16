@@ -7,14 +7,18 @@ const morgan = require('morgan');
 const port = process.env.PORT || 3000;
 const app = express();
 
+const authRoutes = require('./routes/auth');
+
 
 app.use(cors());
 app.use(morgan('dev'));
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
+app.use('/api/auth', authRoutes);
 
 app.use((req, res, next) => {
     next(createError(404, "Route not found"));
@@ -22,6 +26,7 @@ app.use((req, res, next) => {
 
 
 app.use((err, req, res, next) => {
+    console.error(err.stack);
     res.status(err.status || 500);
     res.json({
         error: {
