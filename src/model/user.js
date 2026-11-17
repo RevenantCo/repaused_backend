@@ -53,7 +53,10 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false,
     },
-
+    deleted_at: {
+        type: Date,
+        default: null,
+    },
 },
     {
         collection: 'users',
