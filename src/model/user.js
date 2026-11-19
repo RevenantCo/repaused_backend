@@ -78,6 +78,13 @@ UserSchema.pre('validate', function () {
     }
 });
 
+// Exclude soft-deleted users from all find queries unless explicitly included
+UserSchema.pre(/^find/, function () {
+    if (!this.getOptions().includeDeleted) {
+        this.where({ deleted_at: null });
+    }
+});
+
 // This method is used to hash the password
 UserSchema.methods.hashPassword = function (password) {
     return crypto.
