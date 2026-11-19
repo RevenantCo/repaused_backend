@@ -12,7 +12,7 @@ function registerValidation(body) {
     if (!nickname || nickname.length < 3 || nickname.length > 30) {
         fields.nickname = 'Nickname must be between 3 and 30 characters';
     }
-    if (!github_username || github_username.length < 1 || github_username.length > 39) {
+    if (!github_username || github_username.length < 3 || github_username.length > 39) {
         fields.github_username = 'required, 1–39 characters';
     } else if (
         !/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/.test(github_username)
@@ -73,4 +73,33 @@ function loginValidation(body) {
     };
 }
 
-module.exports = { registerValidation, loginValidation }
+function updateProfileValidation(body) {
+    const fields = {};
+    const data = {};
+
+    if (body.name !== undefined) {
+        const name = typeof body.name === 'string' ? body.name.trim() : '';
+        if (!name || name.length > 100) fields.name = 'Name must be between 1 and 100 characters';
+        else data.name = name;
+    }
+    if (body.email !== undefined) {
+        const email = typeof body.email === 'string' ? body.email.trim() : '';
+        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) fields.email = 'Invalid email address';
+        else data.email = email;
+    }
+    if (body.github_username !== undefined) {
+        const gh = typeof body.github_username === 'string' ? body.github_username.trim() : '';
+        if (!gh || gh.length < 3 || gh.length > 39) fields.github_username = 'required, 1–39 characters';
+        else if (!/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/.test(gh))
+            fields.github_username = 'invalid GitHub username format';
+        else data.github_username = gh;
+    }
+
+    if (Object.keys(fields).length) return { ok: false, fields };
+    if (Object.keys(data).length === 0) return { ok: false, fields: { _: 'No fields to update' } };
+    return { ok: true, data };
+
+
+}
+
+module.exports = { registerValidation, loginValidation, updateProfileValidation }

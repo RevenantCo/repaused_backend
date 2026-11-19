@@ -1,5 +1,5 @@
 require('dotenv').config();
-const express  = require('express');
+const express = require('express');
 const connectDatabase = require('./config/database');
 const createError = require('http-errors');
 const cors = require('cors');
@@ -15,6 +15,8 @@ app.use(morgan('dev'));
 
 app.use(express.json());
 
+
+
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
@@ -27,6 +29,9 @@ app.use((req, res, next) => {
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
+    if (err.name === 'UnauthorizedError') {
+        return res.status(401).json({ error: { message: 'Unauthorized', status: 401 } });
+    }
     res.status(err.status || 500);
     res.json({
         error: {
