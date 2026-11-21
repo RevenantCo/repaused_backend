@@ -3,6 +3,8 @@ let jwt = require('jsonwebtoken');
 
 const { registerValidation, loginValidation, updateProfileValidation } = require('../utils/validator');
 
+// Creates a new user account after checking the signup details.
+// If someone else already has the nickname, email, or GitHub name, tells the caller.
 async function register(req, res, next) {
     try {
         const result = registerValidation(req.body);
@@ -85,6 +87,8 @@ async function register(req, res, next) {
 
 }
 
+// Checks a nickname and password and hands back a login token when they match.
+// Uses the same generic error for a wrong name, wrong password, or deleted account.
 async function login(req, res, next) {
     try {
         const result = loginValidation(req.body);
@@ -145,6 +149,8 @@ async function login(req, res, next) {
     }
 }
 
+// Saves changes to the logged-in user's own details, like name or email.
+// Only the account in the token can be changed.
 async function updateProfile(req, res, next) {
     try {
         const result = updateProfileValidation(req.body);
@@ -198,6 +204,8 @@ async function updateProfile(req, res, next) {
 
 }
 
+// Marks the logged-in user's account as deleted without removing their data.
+// A deleted account can no longer log in.
 async function deleteAccount(req, res, next) {
     try {
         const user = await User.findOne({
@@ -229,6 +237,8 @@ async function deleteAccount(req, res, next) {
 }
 
 
+// Tells a signup visitor whether a nickname is free or already taken.
+// Only checks the database; it does not change anything.
 async function checkNickname(req, res, next) {
     try {
         const nickname = typeof req.query.nickname === 'string' ? req.query.nickname.trim() : '';
@@ -250,6 +260,8 @@ async function checkNickname(req, res, next) {
 
 }
 
+// Tells a signup visitor whether a GitHub username is free or already taken.
+// Checks it without worrying about upper-case or lower-case letters.
 async function checkGithubUsername(req, res, next) {
     try {
         const username = typeof req.query.github_username === 'string' ? req.query.github_username.trim() : '';

@@ -5,6 +5,8 @@ const Project = require('../model/project');
 const User = require('../model/user');
 
 
+// Sends visitors the list of graveyards that are marked as public.
+// Only the title and description are shown.
 async function getGraveyards(req, res, next) {
     try {
         const graveyards = await Graveyard
@@ -21,6 +23,8 @@ async function getGraveyards(req, res, next) {
 
 }
 
+// Shows one public graveyard plus all the projects inside it.
+// Returns a not-found message if the graveyard does not exist.
 async function getGraveyardById(req, res, next) {
     try {
 
@@ -69,6 +73,8 @@ async function getGraveyardById(req, res, next) {
 
 }
 
+// Creates a new graveyard and records the logged-in user as its owner.
+// Requires a title and a description.
 async function createGraveyard(req, res, next) {
     try {
         const result = createGraveyardValidation(req.body);
@@ -99,6 +105,8 @@ async function createGraveyard(req, res, next) {
     }
 }
 
+// Lets the owner change a graveyard's title or description.
+// Other logged-in users are not allowed to change it.
 async function updateGraveyard(req, res, next) {
     try {
         const { id } = req.params;
@@ -150,6 +158,8 @@ async function updateGraveyard(req, res, next) {
     }
 }
 
+// Returns just the graveyards owned by the logged-in user.
+// Used for the simple "my graveyards" list.
 async function getUserGraveyard(req, res, next)
 {
     try {
@@ -173,5 +183,7 @@ async function getUserGraveyard(req, res, next)
         return next(error);
     }
 }
+
+
 
 module.exports = { getGraveyards, getGraveyardById, createGraveyard, updateGraveyard, getUserGraveyard };
