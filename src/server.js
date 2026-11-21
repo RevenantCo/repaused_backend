@@ -9,6 +9,7 @@ const app = express();
 
 const authRoutes = require('./routes/auth');
 const graveyardRoutes = require('./routes/graveyard');
+const projectRoutes = require('./routes/project');
 
 
 app.use(cors());
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoutes);
 app.use('/api/graveyards', graveyardRoutes);
+app.use('/api/projects', projectRoutes);
 
 app.use((req, res, next) => {
     next(createError(404, "Route not found"));

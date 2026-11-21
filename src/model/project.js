@@ -22,6 +22,16 @@ const ProjectSchema = new Schema({
         required: 'Description is required',
         trim: true,
     },
+    github: {
+        repository_url: { type: String, trim: true },
+        repo_name: { type: String, trim: true },
+        readme: { type: String, trim: true },  
+        description: { type: String, trim: true },
+        stars: { type: Number, min: 0 },
+        main_language: { type: String, trim: true },
+        last_commit_date: { type: Date },
+        creation_date: { type: Date },
+    },
 }, {
     collection: 'projects',
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
@@ -33,7 +43,7 @@ ProjectSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         delete returnedObject._id;
         delete returnedObject.__v;
-        return ret;
+        return returnedObject;
     }
 });
 
