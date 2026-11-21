@@ -1,0 +1,394 @@
+{
+  "info": {
+    "name": "Repaused Backend",
+    "description": "End-to-end API collection for Repaused. Run folders in order: Health, Auth, Graveyards, Projects, Dashboard. Login and create requests automatically save token, graveyardId, and projectId into collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Hello check",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"]
+            },
+            "description": "Simple health check."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ada Lovelace\",\n  \"nickname\": \"{{nickname}}\",\n  \"github_username\": \"{{githubUsername}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Creates a user. Expect 201. Run once, then use Login."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "var json = pm.response.json();",
+                  "pm.test('Token returned', function () { pm.expect(json.data.token).to.be.a('string'); });",
+                  "pm.collectionVariables.set('token', json.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickname\": \"{{nickname}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Logs in and stores the JWT as the collection variable 'token'. Protected requests use it automatically."
+          },
+          "response": []
+        },
+        {
+          "name": "Update profile",
+          "request": {
+            "method": "PATCH",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ada Lovelace-Byron\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/update-profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "update-profile"]
+            },
+            "description": "Updates the logged-in user's own profile."
+          },
+          "response": []
+        },
+        {
+          "name": "Check nickname",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/check-nickname?nickname={{nickname}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "check-nickname"],
+              "query": [{ "key": "nickname", "value": "{{nickname}}" }]
+            },
+            "description": "Public availability check. Expect 200 with available: false after registering."
+          },
+          "response": []
+        },
+        {
+          "name": "Check GitHub username",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/check-github-username?github_username={{githubUsername}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "check-github-username"],
+              "query": [{ "key": "github_username", "value": "{{githubUsername}}" }]
+            },
+            "description": "Public availability check. Expect 200 with available: false after registering."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete account",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/delete-account",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "delete-account"]
+            },
+            "description": "Soft-deletes the logged-in account. Run this LAST in the Auth folder, then re-register to continue testing."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Graveyards",
+      "item": [
+        {
+          "name": "List public graveyards",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{baseUrl}}/api/graveyards",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "graveyards"]
+            },
+            "description": "Public list of public graveyards."
+          },
+          "response": []
+        },
+        {
+          "name": "Create graveyard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('graveyardId', json.data.id || json.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Old Scripts\",\n  \"description\": \"Experiments that went nowhere.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/graveyards",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "graveyards"]
+            },
+            "description": "Creates a graveyard owned by the logged-in user and saves its id."
+          },
+          "response": []
+        },
+        {
+          "name": "Add project to graveyard",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('projectId', json.data.id || json.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Old CLI\",\n  \"epitaph\": \"Killed by a better library.\",\n  \"description\": \"A command-line tool from 2022.\",\n  \"github\": {\n    \"repository_url\": \"https://github.com/example/old-cli\",\n    \"repo_name\": \"old-cli\",\n    \"readme\": \"# Old CLI\",\n    \"description\": \"Archived command-line tool\",\n    \"stars\": 42,\n    \"main_language\": \"JavaScript\",\n    \"last_commit_date\": \"2023-01-01T00:00:00.000Z\",\n    \"creation_date\": \"2022-01-01T00:00:00.000Z\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/graveyards/{{graveyardId}}/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "graveyards", "{{graveyardId}}", "projects"]
+            },
+            "description": "Adds a project to your own graveyard and saves its id."
+          },
+          "response": []
+        },
+        {
+          "name": "Get graveyard with projects",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{baseUrl}}/api/graveyards/{{graveyardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "graveyards", "{{graveyardId}}"]
+            },
+            "description": "Public detail view of one graveyard and its projects."
+          },
+          "response": []
+        },
+        {
+          "name": "Update graveyard",
+          "request": {
+            "method": "PATCH",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Renamed Graveyard\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/graveyards/{{graveyardId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "graveyards", "{{graveyardId}}"]
+            },
+            "description": "Owner-only edit. Expect 200."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create project (top-level route)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('projectId', json.data.id || json.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"graveyard\": \"{{graveyardId}}\",\n  \"name\": \"Forgotten Script\",\n  \"epitaph\": \"Never finished.\",\n  \"description\": \"A short-lived experiment.\",\n  \"github\": {\n    \"repo_name\": \"forgotten-script\",\n    \"stars\": 7,\n    \"main_language\": \"Python\"\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects"]
+            },
+            "description": "Alternative create route: graveyard id goes in the body."
+          },
+          "response": []
+        },
+        {
+          "name": "Get project details",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            },
+            "description": "Public detail view including GitHub info."
+          },
+          "response": []
+        },
+        {
+          "name": "Update project",
+          "request": {
+            "method": "PATCH",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Forgotten Script (renamed)\",\n  \"github\": {\n    \"stars\": 8\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "projects", "{{projectId}}"]
+            },
+            "description": "Owner-only edit. Partial GitHub updates keep the other GitHub fields."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "My graveyards and projects",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard"]
+            },
+            "description": "Returns only the logged-in user's graveyards with their projects."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "nickname", "value": "ada" },
+    { "key": "githubUsername", "value": "ada-dev" },
+    { "key": "email", "value": "ada@example.com" },
+    { "key": "password", "value": "secret123" },
+    { "key": "graveyardId", "value": "" },
+    { "key": "projectId", "value": "" }
+  ]
+}

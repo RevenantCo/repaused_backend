@@ -253,6 +253,18 @@ Unmatched routes return:
 - Only public graveyards appear in the public list/detail endpoints; owners see all of their own through the dashboard.
 - Password hashes and salts are never returned in responses.
 
+## Testing with Postman
+
+Import `postman/Repaused.postman_collection.json`. The collection has all 16 requests grouped by feature. Run it in this order:
+
+1. **Health** → confirm the server is running.
+2. **Auth** → Register, Login (saves `token`), checks, profile update. Leave Delete account last.
+3. **Graveyards** → List, Create (saves `graveyardId`), Add project (saves `projectId`), detail, update.
+4. **Projects** → detail and update.
+5. **Dashboard** → your graveyards with projects.
+
+The token and generated ids are stored automatically as collection variables. Edit the `baseUrl`, `nickname`, `githubUsername`, `email`, and `password` variables in the collection if you want different test data.
+
 ## Deployment (Render)
 
 1. Connect this GitHub repo to a Render Web Service.
