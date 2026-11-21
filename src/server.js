@@ -10,7 +10,7 @@ const app = express();
 const authRoutes = require('./routes/auth');
 const graveyardRoutes = require('./routes/graveyard');
 const projectRoutes = require('./routes/project');
-const dashboardRoute = require('./routes/dashbord');
+const dashboardRoute = require('./routes/dashboard');
 
 
 app.use(cors());
