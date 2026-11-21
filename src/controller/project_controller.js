@@ -4,6 +4,8 @@ const Graveyard = require('../model/graveyard');
 const { createProjectValidation, updateProjectValidation } = require('../utils/validator');
 const { getRequester, getOwnedProject } = require('../utils/project_access');
 
+// Adds a new abandoned project inside one of the logged-in user's graveyards.
+// The GitHub details are typed in by the owner; nothing is fetched from GitHub.
 async function createProject(req, res, next) {
     try {
         const result = createProjectValidation(req.body);
@@ -45,6 +47,8 @@ async function createProject(req, res, next) {
     }
 }
 
+// Lets the owner change a project's name, epitaph, description, or GitHub details.
+// Sending only one GitHub field keeps the other GitHub fields as they were.
 async function updateProject(req, res, next) {
     try {
         const user = await getRequester(req);
@@ -92,6 +96,8 @@ async function updateProject(req, res, next) {
     }
 }
 
+// Shows a single project and its GitHub information to any visitor.
+// Returns a not-found message when the project id does not exist.
 async function getProject(req, res, next) {
     try {
         const { id } = req.params;
