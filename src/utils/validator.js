@@ -102,4 +102,58 @@ function updateProfileValidation(body) {
 
 }
 
-module.exports = { registerValidation, loginValidation, updateProfileValidation }
+function createGraveyardValidation(body) {
+    const fields = {};
+    const title = typeof body.title === 'string' ? body.title.trim() : '';
+    const description = typeof body.description === 'string' ? body.description.trim() : '';
+
+    if (!title) {
+        fields.title = 'Title is required';
+    } else if (title.length > 150) {
+        fields.title = 'Title must be at most 150 characters';
+    }
+
+    if (!description) {
+        fields.description = 'Description is required';
+    }
+
+    if (Object.keys(fields).length) {
+        return { ok: false, fields };
+    }
+    return { ok: true, data: { title, description } };
+}
+
+
+function updateGraveyardValidation(body) {
+    const fields = {};
+    const data = {};
+
+    if (body.title !== undefined) {
+        const title = typeof body.title === 'string' ? body.title.trim() : '';
+        if (!title) fields.title = 'Title is required';
+        else if (title.length > 150) fields.title = 'Title must be at most 150 characters';
+        else data.title = title;
+    }
+
+    if (body.description !== undefined) {
+        const description = typeof body.description === 'string' ? body.description.trim() : '';
+        if (!description) fields.description = 'Description is required';
+        else data.description = description;
+    }
+
+    if (Object.keys(fields).length) return { ok: false, fields };
+    if (Object.keys(data).length === 0) {
+        return { ok: false, fields: { _: 'No fields to update' } };
+    }
+    return { ok: true, data };
+}
+
+
+
+module.exports = {
+    registerValidation,
+    loginValidation,
+    updateProfileValidation, 
+    createGraveyardValidation,
+    updateGraveyardValidation,
+}

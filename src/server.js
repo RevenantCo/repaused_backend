@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 const authRoutes = require('./routes/auth');
+const graveyardRoutes = require('./routes/graveyard');
 
 
 app.use(cors());
@@ -21,6 +22,7 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 });
 app.use('/api/auth', authRoutes);
+app.use('/api/graveyards', graveyardRoutes);
 
 app.use((req, res, next) => {
     next(createError(404, "Route not found"));
@@ -28,7 +30,7 @@ app.use((req, res, next) => {
 
 
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    // console.error(err.stack);
     if (err.name === 'UnauthorizedError') {
         return res.status(401).json({ error: { message: 'Unauthorized', status: 401 } });
     }
